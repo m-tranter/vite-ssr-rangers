@@ -153,15 +153,9 @@ export default {
      },
   },
   computed: {
-    copyItems() {
-      return this.$store.state.copyItems;
-    },
     item() {
       return this.$store.state.copyItems.find((x) => x.sys.slug === this.$route.params.event);
     }
   },
-  mounted() {
-      console.log(this.$store.state.copyItems);
-  }
 };
 </script>

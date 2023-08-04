@@ -6,8 +6,7 @@
       tabindex="0"
       class="linkDiv ranger-event-card card card-item flex-md-row align-items-center"
     >
-
-      <a :href="`/events/${item.sys.slug}`"
+    <a :href="`/events/${item.sys.slug}`"
         ><span class="innerLink"
           ><span class="visually-hidden">{{ item.title }}</span></span
         ></a
@@ -68,6 +67,9 @@ export default {
     }
   },
   methods: {
+    setItem: function (obj) {
+      this.$store.dispatch('setItem', obj);
+    },
      formatDate: function (value) {
        return value.toLocaleString('en-GB', this.dateOptions);
      },

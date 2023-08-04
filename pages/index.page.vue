@@ -123,9 +123,6 @@
 <script>
 export default {
   name: 'home',
-  async serverPrefetch() {
-    return this.$store.dispatch("fetchEntries");
-  },
   computed: {
     pages() {
       return this.$store.state.pages;

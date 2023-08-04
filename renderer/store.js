@@ -5,7 +5,7 @@ function createStore() {
   const store = Vuex.createStore({
     state() {
       return {
-        url: 'https://cms-chesheast.cloud.contensis.com/api/delivery/projects/website/contentTypes/rangerEvents/entries?accessToken=QCpZfwnsgnQsyHHB3ID5isS43cZnthj6YoSPtemxFGtcH15I&pageSize=500',
+        item: {},
         items: [],
         copyItems: [],
         searchedItems: [],
@@ -53,6 +53,9 @@ function createStore() {
       };
     },
     actions: {
+      setItem({ commit }, obj) {
+        commit('SET_ITEM', obj);
+      },
       searchFilter({ commit }) {
         commit('SEARCH_FILTER');
         commit('CALCULATE_PAGES');
@@ -86,20 +89,11 @@ function createStore() {
         commit('CALCULATE_PAGES');
         commit('CREATE_PAGES');
       },
-      async fetchEntries({ commit, state }) {
-        let { items } = await fetch(state.url).then((response) => {
-          return response.json();
-        });
-        let arr = createDates(items.slice());
-        if (arr.length) {
-          arr.sort(sortDate);
-        }
-        commit('SET_ITEMS', arr);
-        commit('CALCULATE_PAGES');
-        commit('CREATE_PAGES');
-      },
     },
     mutations: {
+      SET_ITEM(state, obj) {
+        state.item = obj;
+      },
       SET_SEARCH_TERM(state, v) {
         state.searchTerm = v;
       },
@@ -177,19 +171,3 @@ function createStore() {
   });
   return store;
 }
-
-const sortDate = (a, b) => {
-  return a.dateStartEnd.from - b.dateStartEnd.from;
-};
-
-const createDates = (arr) => {
-  return arr.map((e) => {
-    return {
-      ...e,
-      dateStartEnd: {
-        to: new Date(e.dateStartEnd.to),
-        from: new Date(e.dateStartEnd.from),
-      },
-    };
-  });
-};

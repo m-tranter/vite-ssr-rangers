@@ -1,16 +1,16 @@
-import { renderToString } from '@vue/server-renderer'
-import { escapeInject, dangerouslySkipEscape } from 'vite-plugin-ssr/server'
-import { createApp } from './app'
+import { renderToString } from '@vue/server-renderer';
+import { escapeInject, dangerouslySkipEscape } from 'vite-plugin-ssr/server';
+import { createApp } from './app';
 import logoUrl from './favicon.ico';
 
-export { render }
-export { onBeforeRender }
-export { passToClient }
+export { render };
+export { onBeforeRender };
+export { passToClient };
 
-const passToClient = ['INITIAL_STATE']
+const passToClient = ['INITIAL_STATE'];
 
 async function render(pageContext) {
-  const { appHtml } = pageContext
+  const { appHtml } = pageContext;
   return escapeInject`<!DOCTYPE html>
     <html lang="en">
       <head>
@@ -27,21 +27,48 @@ async function render(pageContext) {
       <body>
         <div id="app">${dangerouslySkipEscape(appHtml)}</div>
       </body>
-    </html>`
+    </html>`;
 }
 
 async function onBeforeRender(pageContext) {
-  const { Page } = pageContext
-  const { app, store } = createApp({ Page })
+  const { Page } = pageContext;
+  const { app, store } = createApp({ Page });
 
-  const appHtml = await renderToString(app)
+  const appHtml = await renderToString(app);
 
-  const INITIAL_STATE = store.state
+  let url =
+    'https://cms-chesheast.cloud.contensis.com/api/delivery/projects/website/contentTypes/rangerEvents/entries?accessToken=QCpZfwnsgnQsyHHB3ID5isS43cZnthj6YoSPtemxFGtcH15I&pageSize=500';
+  let { items } = await fetch(url).then((response) => {
+    return response.json();
+  });
+  let arr = createDates(items.slice());
+  if (arr.length) {
+    arr.sort(sortDate);
+  }
+
+  store.dispatch('setItems', arr);
+  const INITIAL_STATE = store.state;
 
   return {
     pageContext: {
       INITIAL_STATE,
-      appHtml
-    }
-  }
+      appHtml,
+    },
+  };
 }
+
+const sortDate = (a, b) => {
+  return a.dateStartEnd.from - b.dateStartEnd.from;
+};
+
+const createDates = (arr) => {
+  return arr.map((e) => {
+    return {
+      ...e,
+      dateStartEnd: {
+        to: new Date(e.dateStartEnd.to),
+        from: new Date(e.dateStartEnd.from),
+      },
+    };
+  });
+};
